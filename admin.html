@@ -1,20 +1,50 @@
-<table border="1" id="table"></table>
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {font-family: Arial; padding:10px;}
+.card {background:#f4f4f4; padding:10px; margin:10px 0;}
+button {margin-top:5px;}
+</style>
+</head>
+
+<body>
+
+<h2>📊 Admin Panel</h2>
+
+<div id="list"></div>
 
 <script>
-fetch("https://docs.google.com/spreadsheets/d/e/2PACX-1vRfBRhpH8GJ6nEI37nO03kEAkU7ozkdiS-pv-bhclOJIjETU0N-ruHKlsgd2K9D5ueiUJhkb9v3e98y/pubhtml")
-.then(r=>r.text())
-.then(d=>{
-  let rows = d.split("\n");
-  let html="";
 
-  rows.forEach(r=>{
-    html += "<tr>";
-    r.split(",").forEach(c=>{
-      html += "<td>"+c+"</td>";
-    });
-    html += "</tr>";
-  });
+async function loadData(){
 
-  document.getElementById("table").innerHTML = html;
+let res = await fetch("https://script.google.com/macros/s/AKfycbyUANWo8X6FinYifVf63OOtRKlzPYiJSPvJO5lVDjJdzK9OSIke7zrm9uOnG12NLsd_/exec");
+let data = await res.json();
+
+let html="";
+
+data.reverse().forEach((d,i)=>{
+
+html+=`
+<div class="card">
+<b>${d.name}</b><br>
+📞 ${d.phone}<br>
+🏥 ${d.clinic}<br>
+📅 ${d.date}<br>
+⏰ ${d.time}<br>
+Status: ${d.status}
+</div>
+`;
 });
+
+document.getElementById("list").innerHTML = html;
+}
+
+loadData();
+
 </script>
+
+</body>
+</html>
