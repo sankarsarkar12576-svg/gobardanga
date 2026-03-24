@@ -14,11 +14,14 @@
 }
 
 .title p {
-  background: #f1f1f1;
-  padding: 10px;
-  border-radius: 8px;
-  margin: 0;
-  text-align: left;
+  display: inline-block;
+  padding: 8px 10px;
+  margin: 5px 4px;
+  border: 1px solid #0d6efd;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 .special p {
   background: #f5f7fa;
@@ -32,12 +35,14 @@
 }
     .card {
   background: white;
-  margin: 15px;
+  margin: auto;
   padding: 15px;
   border-radius: 12px;
   box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 body {
+  fint-family: arial;
+  padding:10px
   margin: 0;
   font-family: 'Segoe UI', sans-serif;
   background: #91caf5;
@@ -94,6 +99,7 @@ body {
   width: 420px;
   border-radius: 200%;
   margin-bottom: 5px;
+  margin: auto;
 }
 
 .card h2 {
@@ -106,17 +112,14 @@ body {
 
 /* 🔥 Button */
 .btn {
-  background: #4786e6;
-  color: white;
+  width: 100%;
   padding: 12px;
-  border: 10px;
+  margin-top: 10px;
+  background: #0d6efd;
+  color: white;
+  border: none;
   border-radius: 10px;
-  width: 15%;
-  margin-top: 15px;
   font-size: 16px;
-  display:block;
-  justify-content: center;
-  margin: 20px auto;
 }
 
 /* 🔥 Footer */
@@ -208,9 +211,14 @@ h2 {
 
 /* Grid */
 .container {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
-  gap: 15px;
+  display: inline-block;
+  padding: 8px 10px;
+  margin: 5px 4px;
+  border: 1px solid #0d6efd;
+  border-radius: 6px;
+  font-size: 14px;
+  cursor: pointer;
+  white-space: nowrap;
 }
 
 /* Card */
