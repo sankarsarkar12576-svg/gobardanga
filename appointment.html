@@ -89,9 +89,8 @@ button {
 <script>
 let selectedDate="", selectedTime="";
     let bookedSlots = [];
-  async function loadBooked(){
-
-let res = await fetch("https://script.google.com/macros/s/AKfycbxE0L7s6bEEof8A0L_3O_MSECh6YglFeO4qQhGpVsmxjydk7nNzAxPGwlTzgIQcdlRy/exec");
+{
+  let res = await fetch("https://script.google.com/macros/s/AKfycbxE0L7s6bEEof8A0L_3O_MSECh6YglFeO4qQhGpVsmxjydk7nNzAxPGwlTzgIQcdlRy/exec");
 bookedSlots = await res.json();
 
 }
