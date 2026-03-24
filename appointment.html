@@ -3,31 +3,16 @@
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<title>Appointment</title>
-
 <style>
-body {
-  font-family: Arial;
-  background:#f4f8fb;
-  padding:15px;
-}
+body {font-family: Arial; padding:15px; background:#f4f8fb;}
+.card {background:white; padding:15px; border-radius:10px;}
 
-.card {
-  background:white;
-  padding:15px;
-  border-radius:10px;
-}
-
-/* input */
 input, select {
   width:100%;
   padding:10px;
   margin:8px 0;
-  border-radius:6px;
-  border:1px solid #ccc;
 }
 
-/* day box */
 .day {
   margin:10px 0;
   padding:10px;
@@ -35,31 +20,25 @@ input, select {
   border-radius:8px;
 }
 
-/* slot */
 .slot {
   display:inline-block;
   padding:6px 10px;
   margin:5px;
   border:1px solid #0d6efd;
-  border-radius:6px;
   cursor:pointer;
+  border-radius:6px;
 }
 
-.selected {
-  background:#0d6efd;
-  color:white;
-}
+.selected {background:#0d6efd;color:white;}
 
-/* button */
 button {
   width:100%;
   padding:12px;
-  margin-top:15px;
+  margin-top:10px;
   background:#0d6efd;
   color:white;
   border:none;
   border-radius:10px;
-  font-size:16px;
 }
 </style>
 </head>
@@ -79,10 +58,10 @@ button {
 <option value="g1">Gobardanga Polyclinic</option>
 <option value="g2">Prosanna Gang Clinic</option>
 <option value="tarunipur">Tarunipur (Monday)</option>
-<option value="bithari">Bithari (Monday)</option>
-<option value="aajat">Aajat Pharmacy (Monday)</option>
-<option value="katiya">Katiya Hat (Monday)</option>
-<option value="basirhat">Basirhat (Monday)</option>
+<option value="bithari">Bithari</option>
+<option value="aajat">Aajat Pharmacy</option>
+<option value="katiya">Katiya Hat</option>
+<option value="basirhat">Basirhat</option>
 <option value="t1">German Clinic (Tuesday)</option>
 <option value="t2">New German (Tuesday)</option>
 <option value="th1">Dharampur (Thursday)</option>
@@ -112,10 +91,10 @@ g2:{days:[1,2,3,4,5,6], start:10, end:12},
 
 tarunipur:{days:[1], start:8, end:11},
 
-bithari:{days:[1], start:12, end:14},
-aajat:{days:[1], start:15, end:16},
-katiya:{days:[1], start:17, end:19},
-basirhat:{days:[1], start:19, end:21},
+bithari:{days:[0,1,2,3,4,5,6], start:12, end:14},
+aajat:{days:[0,1,2,3,4,5,6], start:15, end:16},
+katiya:{days:[0,1,2,3,4,5,6], start:17, end:19},
+basirhat:{days:[0,1,2,3,4,5,6], start:19, end:21},
 
 t1:{days:[2], start:10, end:12},
 t2:{days:[2], start:12, end:14},
@@ -128,7 +107,7 @@ sat2:{days:[6], start:10, end:13}
 
 };
 
-/* generate days */
+/* generate */
 function generate(){
 
 let clinic=document.getElementById("clinic").value;
@@ -140,6 +119,11 @@ return;
 
 let rules = clinicData[clinic];
 
+if(!rules){
+alert("Clinic error ❌");
+return;
+}
+
 let today=new Date();
 let html="";
 
@@ -150,30 +134,13 @@ d.setDate(today.getDate()+i);
 
 let day=d.getDay();
 
-if(!rules.days.includes(day)) continue;
+if(rules.days.indexOf(day) === -1) continue;
 
 let dateStr=d.toISOString().split("T")[0];
-let dayName=d.toDateString();
 
-html += `
-<div class="day">
-<b>${dayName}</b>
-<div>
-${createSlots(rules.start,rules.end,dateStr)}
-</div>
-</div>
-`;
-}
+html += "<div class='day'><b>"+d.toDateString()+"</b><br>";
 
-document.getElementById("days").innerHTML = html;
-}
-
-/* create slots */
-function createSlots(start,end,date){
-
-let html="";
-
-for(let h=start;h<end;h++){
+for(let h=rules.start;h<rules.end;h++){
 for(let m=0;m<60;m+=10){
 
 let hour=h>12?h-12:h;
@@ -182,16 +149,23 @@ let min=m<10?"0"+m:m;
 
 let time=hour+":"+min+" "+ampm;
 
-html += `<span class="slot" onclick="selectSlot(this,'${date}','${time}')">${time}</span>`;
+html += "<span class='slot' onclick=\"selectSlot(this,'"+dateStr+"','"+time+"')\">"+time+"</span>";
 }
 }
 
-return html;
+html += "</div>";
 }
+
+document.getElementById("days").innerHTML = html;
+}
+
 /* select */
 function selectSlot(el,date,time){
 
-document.querySelectorAll(".slot").forEach(s=>s.classList.remove("selected"));
+let all=document.getElementsByClassName("slot");
+for(let i=0;i<all.length;i++){
+all[i].classList.remove("selected");
+}
 
 el.classList.add("selected");
 
@@ -200,7 +174,7 @@ selectedTime=time;
 }
 
 /* booking */
-async function confirmBooking(){
+function confirmBooking(){
 
 let name=document.getElementById("name").value;
 let phone=document.getElementById("phone").value;
@@ -211,31 +185,15 @@ alert("Fill all details ❌");
 return;
 }
 
-/* token generate */
-let token = generateToken(name, selectedTime);
-
-/* localStorage save */
-localStorage.setItem("tokenData", JSON.stringify({
-  name, phone, clinic,
-  date:selectedDate,
-  time:selectedTime,
-  token:token
-}));
-
-/* redirect */
-window.location.href = "token.html";
+alert(
+"Booked ✅\n\n"+
+"Name: "+name+"\n"+
+"Phone: "+phone+"\n"+
+"Date: "+selectedDate+"\n"+
+"Time: "+selectedTime
+);
 
 }
-
-// time → 08:30 AM → 0830
-let t = time.replace(" AM","").replace(" PM","");
-let parts = t.split(":");
-
-let hour = parts[0].padStart(2,'0');
-let min = parts[1];
-
-return first + hour + min;
-
 
 </script>
 
