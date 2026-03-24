@@ -174,7 +174,7 @@ selectedTime=time;
 }
 
 /* booking */
-function confirmBooking(){
+async function confirmBooking(){
 
 let name=document.getElementById("name").value;
 let phone=document.getElementById("phone").value;
@@ -183,6 +183,17 @@ let clinic=document.getElementById("clinic").value;
 if(!name || !phone || !clinic || !selectedDate || !selectedTime){
 alert("Fill all details ❌");
 return;
+}
+
+await fetch("https://script.google.com/macros/s/AKfycbypAzQ_Mh-aJ26BtWpuZgj6IKOpdKMdB_PZhoWexyfnichdQSRCusFABbQZsHuJPaGr/execL", {
+  method:"POST",
+  body: JSON.stringify({
+    name, phone, clinic,
+    date:selectedDate,
+    time:selectedTime
+  })
+});
+
 }
 
 alert(
