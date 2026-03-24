@@ -91,7 +91,7 @@ let selectedDate="", selectedTime="";
     let bookedSlots = [];
   async function loadBooked(){
 
-let res = await fetch("https://script.google.com/macros/s/AKfycbxmDWlCQWy3JEzcRfMR3cJO7ZSuABSgoWbS4hHx3UnswSE0hlcF1v_R_KtiZroMMrfj/exec");
+let res = await fetch("https://script.google.com/macros/s/AKfycbzo4OqvEvhDCgvPAx2MycMwMwBvZ48ZatRnlT1sjBH9QgEURkhipDGWfH0_lKvKgns2/exec");
 bookedSlots = await res.json();
 
 }
@@ -214,7 +214,7 @@ return;
 
 try{
 
-await fetch("https://script.google.com/macros/s/AKfycbyzyODwUW_tC0nTqiYMmua6Doahf1i82j2Alsg2AjgNRydqWftzSmd8HpqZ3l40Wggp/exec", {
+await fetch("https://script.google.com/macros/s/AKfycbzo4OqvEvhDCgvPAx2MycMwMwBvZ48ZatRnlT1sjBH9QgEURkhipDGWfH0_lKvKgns2/exec", {
   method:"POST",
   mode: "no-cors",
   body: JSON.stringify({
