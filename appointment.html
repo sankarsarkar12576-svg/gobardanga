@@ -87,8 +87,16 @@ button {
 </div>
 
 <script>
-
 let selectedDate="", selectedTime="";
+    let bookedSlots = [];
+  async function loadBooked(){
+
+let res = await fetch("https://script.google.com/macros/s/AKfycbxmDWlCQWy3JEzcRfMR3cJO7ZSuABSgoWbS4hHx3UnswSE0hlcF1v_R_KtiZroMMrfj/exec");
+bookedSlots = await res.json();
+
+}
+
+loadBooked();
 
 /* clinic rules */
 const clinicData = {
