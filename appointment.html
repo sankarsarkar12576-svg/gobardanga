@@ -188,9 +188,12 @@ return;
 
 try{
 
-await fetch("https://script.google.com/macros/s/AKfycbypAzQ_Mh-aJ26BtWpuZgj6IKOpdKMdB_PZhoWexyfnichdQSRCusFABbQZsHuJPaGr/exec", {
+await fetch("https://script.google.com/macros/s/AKfycbynki1mf82-66LHmCimXbkZnm3j4dPKma5fFYDI3i4K-ye0DtCnMEUkxOrG79qmbuv_/exec", {
   method:"POST",
   mode: "no-cors",
+  headers:{
+    "content-type": "application/json"
+  },
   body: JSON.stringify({
     name: name,
     phone: phone,
