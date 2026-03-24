@@ -174,7 +174,8 @@ selectedTime=time;
 }
 
 /* booking */
-  {
+/* booking */
+async function confirmBooking(){
 
 let name=document.getElementById("name").value;
 let phone=document.getElementById("phone").value;
@@ -185,24 +186,31 @@ alert("Fill all details ❌");
 return;
 }
 
-await fetch("https://script.google.com/macros/s/AKfycbypAzQ_Mh-aJ26BtWpuZgj6IKOpdKMdB_PZhoWexyfnichdQSRCusFABbQZsHuJPaGr/execL", {
+try{
+
+await fetch("https://script.google.com/macros/s/AKfycbypAzQ_Mh-aJ26BtWpuZgj6IKOpdKMdB_PZhoWexyfnichdQSRCusFABbQZsHuJPaGr/exec", {
   method:"POST",
   body: JSON.stringify({
-    name, phone, clinic,
-    date:selectedDate,
-    time:selectedTime
+    name: name,
+    phone: phone,
+    clinic: clinic,
+    date: selectedDate,
+    time: selectedTime
   })
 });
 
-}
-
 alert(
-"Booked ✅\n\n"+
+"Booked Successfully ✅\n\n"+
 "Name: "+name+"\n"+
 "Phone: "+phone+"\n"+
 "Date: "+selectedDate+"\n"+
 "Time: "+selectedTime
 );
+
+}catch(e){
+alert("Error saving booking ❌");
+console.log(e);
+}
 
 }
 
