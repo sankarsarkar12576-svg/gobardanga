@@ -158,6 +158,17 @@ html += "</div>";
 
 document.getElementById("days").innerHTML = html;
 }
+  let isBooked = bookedSlots.find(b =>
+  b.clinic === clinic &&
+  b.date === dateStr &&
+  b.time === time
+);
+
+if(isBooked){
+  html += `<span class='slot booked'>${time}</span>`;
+}else{
+  html += `<span class='slot' onclick="selectSlot(this,'${dateStr}','${time}')">${time}</span>`;
+}
 
 /* select */
 function selectSlot(el,date,time){
