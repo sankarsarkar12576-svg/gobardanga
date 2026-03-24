@@ -182,13 +182,12 @@ let min=m<10?"0"+m:m;
 
 let time=hour+":"+min+" "+ampm;
 
-html+=`<span class="slot" onclick="selectSlot(this,'${date}','${time}')">${time}</span>`;
+html += `<span class="slot" onclick="selectSlot(this,'${date}','${time}')">${time}</span>`;
 }
 }
 
 return html;
 }
-
 /* select */
 function selectSlot(el,date,time){
 
