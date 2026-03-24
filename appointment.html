@@ -155,7 +155,7 @@ if(!rules.days.includes(day)) continue;
 let dateStr=d.toISOString().split("T")[0];
 let dayName=d.toDateString();
 
-html+=`
+html += `
 <div class="day">
 <b>${dayName}</b>
 <div>
@@ -165,7 +165,7 @@ ${createSlots(rules.start,rules.end,dateStr)}
 `;
 }
 
-document.getElementById("days").innerHTML=html;
+document.getElementById("days").innerHTML = html;
 }
 
 /* create slots */
