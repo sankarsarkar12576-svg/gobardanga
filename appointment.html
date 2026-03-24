@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>Appointment</title>
+
+<style>
+body {
+  font-family: Arial;
+  background:#f4f8fb;
+  padding:15px;
+}
+
+.card {
+  background:white;
+  padding:15px;
+  border-radius:10px;
+}
+
+/* input */
+input, select {
+  width:100%;
+  padding:10px;
+  margin:8px 0;
+  border-radius:6px;
+  border:1px solid #ccc;
+}
+
+/* day box */
+.day {
+  margin:10px 0;
+  padding:10px;
+  background:#eef3ff;
+  border-radius:8px;
+}
+
+/* slot */
+.slot {
+  display:inline-block;
+  padding:6px 10px;
+  margin:5px;
+  border:1px solid #0d6efd;
+  border-radius:6px;
+  cursor:pointer;
+}
+
+.selected {
+  background:#0d6efd;
+  color:white;
+}
+
+/* button */
+button {
+  width:100%;
+  padding:12px;
+  margin-top:15px;
+  background:#0d6efd;
+  color:white;
+  border:none;
+  border-radius:10px;
+  font-size:16px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>📅 Book Appointment</h2>
+
+<input id="name" placeholder="Your Name">
+<input id="phone" placeholder="Phone Number">
+
+<select id="clinic">
+<option value="">Select Clinic</option>
+
+<option value="g1">Gobardanga Polyclinic</option>
+<option value="g2">Prosanna Gang Clinic</option>
+<option value="tarunipur">Tarunipur (Monday)</option>
+<option value="bithari">Bithari (Monday)</option>
+<option value="aajat">Aajat Pharmacy (Monday)</option>
+<option value="katiya">Katiya Hat (Monday)</option>
+<option value="basirhat">Basirhat (Monday)</option>
+<option value="t1">German Clinic (Tuesday)</option>
+<option value="t2">New German (Tuesday)</option>
+<option value="th1">Dharampur (Thursday)</option>
+<option value="th2">Nagoruchra (Thursday)</option>
+<option value="sat1">Banga Clinic (Saturday)</option>
+<option value="sat2">Chakrabarty Hall (Saturday)</option>
+
+</select>
+
+<button onclick="generate()">Show Available Time</button>
+
+<div id="days"></div>
+
+<button onclick="confirmBooking()">✅ Book Appointment</button>
+
+</div>
+
+<script>
+
+let selectedDate="", selectedTime="";
+
+/* clinic rules */
+const clinicData = {
+
+g1:{days:[1,2,3,4,5,6], start:8, end:10},
+g2:{days:[1,2,3,4,5,6], start:10, end:12},
+
+tarunipur:{days:[1], start:8, end:11},
+
+bithari:{days:[1], start:12, end:14},
+aajat:{days:[1], start:15, end:16},
+katiya:{days:[1], start:17, end:19},
+basirhat:{days:[1], start:19, end:21},
+
+t1:{days:[2], start:10, end:12},
+t2:{days:[2], start:12, end:14},
+
+th1:{days:[4], start:11, end:12},
+th2:{days:[4], start:12, end:14},
+
+sat1:{days:[6], start:10, end:13},
+sat2:{days:[6], start:10, end:13}
+
+};
+
+/* generate days */
+function generate(){
+
+let clinic=document.getElementById("clinic").value;
+
+if(!clinic){
+alert("Select clinic first ❌");
+return;
+}
+
+let rules = clinicData[clinic];
+
+let today=new Date();
+let html="";
+
+for(let i=0;i<7;i++){
+
+let d=new Date();
+d.setDate(today.getDate()+i);
+
+let day=d.getDay();
+
+if(!rules.days.includes(day)) continue;
+
+let dateStr=d.toISOString().split("T")[0];
+let dayName=d.toDateString();
+
+html+=`
+<div class="day">
+<b>${dayName}</b>
+<div>
+${createSlots(rules.start,rules.end,dateStr)}
+</div>
+</div>
+`;
+}
+
+document.getElementById("days").innerHTML=html;
+}
+
+/* create slots */
+function createSlots(start,end,date){
+
+let html="";
+
+for(let h=start;h<end;h++){
+for(let m=0;m<60;m+=10){
+
+let hour=h>12?h-12:h;
+let ampm=h>=12?"PM":"AM";
+let min=m<10?"0"+m:m;
+
+let time=hour+":"+min+" "+ampm;
+
+html+=`<span class="slot" onclick="selectSlot(this,'${date}','${time}')">${time}</span>`;
+}
+}
+
+return html;
+}
+
+/* select */
+function selectSlot(el,date,time){
+
+document.querySelectorAll(".slot").forEach(s=>s.classList.remove("selected"));
+
+el.classList.add("selected");
+
+selectedDate=date;
+selectedTime=time;
+}
+
+/* booking */
+async function confirmBooking(){
+
+let name=document.getElementById("name").value;
+let phone=document.getElementById("phone").value;
+let clinic=document.getElementById("clinic").value;
+
+if(!name || !phone || !clinic || !selectedDate || !selectedTime){
+alert("Fill all details ❌");
+return;
+}
+
+/* token generate */
+let token = generateToken(name, selectedTime);
+
+/* localStorage save */
+localStorage.setItem("tokenData", JSON.stringify({
+  name, phone, clinic,
+  date:selectedDate,
+  time:selectedTime,
+  token:token
+}));
+
+/* redirect */
+window.location.href = "token.html";
+
+}
+
+// time → 08:30 AM → 0830
+let t = time.replace(" AM","").replace(" PM","");
+let parts = t.split(":");
+
+let hour = parts[0].padStart(2,'0');
+let min = parts[1];
+
+return first + hour + min;
+
+
+</script>
+
+</body>
+</html>

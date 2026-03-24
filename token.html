@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<style>
+body {
+  font-family: Arial;
+  background:#f4f8fb;
+  text-align:center;
+  padding:20px;
+}
+
+.card {
+  background:white;
+  padding:20px;
+  border-radius:10px;
+}
+
+.token {
+  font-size:40px;
+  font-weight:bold;
+  color:#0d6efd;
+  margin:20px 0;
+}
+</style>
+</head>
+
+<body>
+
+<div class="card">
+
+<h2>✅ Appointment Confirmed</h2>
+
+<div class="token" id="token"></div>
+
+<p id="details"></p>
+
+<button onclick="goBack()">⬅ Back</button>
+
+</div>
+
+<script>
+
+let data = JSON.parse(localStorage.getItem("tokenData"));
+
+if(data){
+
+document.getElementById("token").innerText = data.token;
+
+document.getElementById("details").innerHTML =
+"Name: "+data.name+"<br>"+
+"Phone: "+data.phone+"<br>"+
+"Date: "+data.date+"<br>"+
+"Time: "+data.time;
+
+}
+
+function goBack(){
+window.location.href="index.html";
+}
+
+</script>
+
+</body>
+</html>
