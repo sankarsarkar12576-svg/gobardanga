@@ -4,11 +4,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {
-  font-family: Arial;
-  background:#eef3ff;
-  margin:0;
-}
+body {font-family: Arial; background:#eef3ff; margin:0;}
 
 .card {
   background:white;
@@ -26,28 +22,6 @@ input, select {
   margin:8px 0;
   border-radius:8px;
   border:1px solid #ccc;
-  font-size:16px;
-}
-
-/* time buttons */
-.time-box{
-  display:flex;
-  flex-wrap:wrap;
-  gap:8px;
-}
-
-.time{
-  flex:1 0 45%;
-  text-align:center;
-  padding:10px;
-  border:1px solid #0d6efd;
-  border-radius:8px;
-  cursor:pointer;
-}
-
-.selected{
-  background:#0d6efd;
-  color:white;
 }
 
 button {
@@ -57,7 +31,6 @@ button {
   color:white;
   border:none;
   border-radius:10px;
-  font-size:16px;
 }
 </style>
 </head>
@@ -73,22 +46,18 @@ button {
 
 <select id="clinic">
 <option value="">Select Clinic</option>
-<option value="g1">Gobardanga Polyclinic</option>
-<option value="g2">Prosanna Gang Clinic</option>
+<option value="g1">Gobardanga</option>
+<option value="g2">Prosanna Gang</option>
 <option value="t1">German Clinic</option>
 </select>
 
 <select id="date"></select>
-
-<div id="timeBox" class="time-box"></div>
 
 <button onclick="confirmBooking()">Book Appointment</button>
 
 </div>
 
 <script>
-
-let selectedTime="";
 
 /* load 7 days */
 function loadDates(){
@@ -109,43 +78,29 @@ document.getElementById("date").innerHTML=html;
 }
 loadDates();
 
-/* clinic time */
-const clinicTime={
-g1:["8:00 AM","9:00 AM","5:00 PM","6:00 PM"],
-g2:["10:00 AM","11:00 AM","2:00 PM","3:00 PM"],
-t1:["10:00 AM","11:00 AM"]
+/* clinic start time */
+const clinicStart={
+g1:"08:00",
+g2:"10:00",
+t1:"11:00"
 };
 
-/* show time */
-document.getElementById("clinic").addEventListener("change",function(){
+/* convert time */
+function addMinutes(time, mins){
 
-let clinic=this.value;
-let times=clinicTime[clinic]||[];
+let [h,m]=time.split(":").map(Number);
 
-let html="";
+let total=h*60+m+mins;
 
-times.forEach(t=>{
-html+=`<div class="time" onclick="selectTime(this,'${t}')">${t}</div>`;
-});
+let nh=Math.floor(total/60);
+let nm=total%60;
 
-document.getElementById("timeBox").innerHTML=html;
+let ampm=nh>=12?"PM":"AM";
 
-});
+nh = nh>12?nh-12:nh;
+if(nh==0) nh=12;
 
-/* select */
-function selectTime(el,time){
-
-document.querySelectorAll(".time").forEach(t=>t.classList.remove("selected"));
-
-el.classList.add("selected");
-selectedTime=time;
-}
-
-/* token */
-function generateToken(name,time){
-let first=name.charAt(0).toUpperCase();
-let serial=Math.floor(Math.random()*900+100);
-return first+serial+time.replace(":","").replace(" ","");
+return nh+":"+(nm<10?"0"+nm:nm)+" "+ampm;
 }
 
 /* booking */
@@ -156,17 +111,27 @@ let phone=document.getElementById("phone").value;
 let clinic=document.getElementById("clinic").value;
 let date=document.getElementById("date").value;
 
-if(!name||!phone||!clinic||!date||!selectedTime){
+if(!name||!phone||!clinic||!date){
 alert("সব তথ্য পূরণ করুন ❌");
 return;
 }
 
-let token=generateToken(name,selectedTime);
+/* serial (simple random now) */
+let serial=Math.floor(Math.random()*50);
+
+/* start time */
+let start=clinicStart[clinic];
+
+/* auto time */
+let time=addMinutes(start, serial*7);
+
+/* token */
+let token=name.charAt(0).toUpperCase()+serial;
 
 /* redirect */
 window.location.href="token.html?token="+token+
 "&name="+name+
-"&time="+selectedTime+
+"&time="+time+
 "&date="+date;
 
 }
