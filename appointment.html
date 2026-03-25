@@ -207,20 +207,25 @@ alert("Fill all details");
 return;
 }
 
+try{
+
 let res=await fetch(SCRIPT_URL,{
 method:"POST",
 body:JSON.stringify({name,phone,clinic,date:selectedDate})
 });
 
-let text=await res.text();
+// 🔥 JSON receive করো
+let data=await res.json();
 
-alert("✅ Booking Confirmed\n"+text);
+// 🔥 redirect to token page
+window.location.href = `token.html?name=${name}&phone=${phone}&clinic=${clinic}&date=${selectedDate}&time=${data.time}&token=${data.token}`;
+
+}catch(e){
+alert("Booking error");
+console.log(e);
 }
 
-function goBack(){
-history.back();
 }
-
 </script>
 
 </body>
