@@ -1,48 +1,60 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {font-family: Arial; padding:10px;}
-.card {background:#f4f4f4; padding:10px; margin:10px 0;}
-button {margin-top:5px;}
+body{font-family:Arial;background:#f4f8fb;padding:10px;}
+
+.card{
+padding:12px;
+margin:10px 0;
+border-radius:10px;
+color:white;
+}
+
+.green{background:#28a745;}
+.red{background:#dc3545;}
 </style>
 </head>
 
 <body>
 
-<h2>📊 Admin Panel</h2>
+<h2>📊 Appointment List</h2>
 
 <div id="list"></div>
 
 <script>
 
-async function loadData(){
+const URL="https://script.google.com/macros/s/XXXXX/exec";
 
-let res = await fetch("https://script.google.com/macros/s/AKfycbzo4OqvEvhDCgvPAx2MycMwMwBvZ48ZatRnlT1sjBH9QgEURkhipDGWfH0_lKvKgns2/exec");
-let data = await res.json();
+async function load(){
+
+let res=await fetch(URL);
+let data=await res.json();
 
 let html="";
 
-data.reverse().forEach((d,i)=>{
+data.reverse().forEach(d=>{
+
+let cls = d.status==="PAST" ? "red" : "green";
 
 html+=`
-<div class="card">
-<b>${d.name}</b><br>
+<div class="card ${cls}">
+<b>${d.token}</b><br>
+${d.name}<br>
 📞 ${d.phone}<br>
 🏥 ${d.clinic}<br>
 📅 ${d.date}<br>
-⏰ ${d.time}<br>
-Status: ${d.status}
+⏰ ${d.time}
 </div>
 `;
 });
 
-document.getElementById("list").innerHTML = html;
+document.getElementById("list").innerHTML=html;
 }
 
-loadData();
+load();
 
 </script>
 
