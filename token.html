@@ -4,9 +4,18 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {font-family:Arial;text-align:center;padding:20px;background:#f4f8fb;}
-.card {background:white;padding:20px;border-radius:10px;}
-.token {font-size:30px;color:#0d6efd;margin:15px 0;}
+body {font-family:Arial;text-align:center;padding:20px;background:#eef3ff;}
+.card {background:white;padding:20px;border-radius:12px;}
+.token {font-size:32px;color:#0d6efd;margin:15px 0;}
+
+.btn{
+  padding:12px 20px;
+  background:#0d6efd;
+  color:white;
+  border:none;
+  border-radius:10px;
+  margin-top:10px;
+}
 </style>
 </head>
 
@@ -22,16 +31,33 @@ body {font-family:Arial;text-align:center;padding:20px;background:#f4f8fb;}
 
 <div class="token" id="token"></div>
 
+<button class="btn" onclick="goHome()">🏠 Back to Home</button>
+
 </div>
 
 <script>
 
 let params = new URLSearchParams(window.location.search);
 
-document.getElementById("name").innerText = "Name: "+params.get("name");
-document.getElementById("date").innerText = "Date: "+params.get("date");
-document.getElementById("time").innerText = "Time: "+params.get("time");
-document.getElementById("token").innerText = params.get("token");
+let data = {
+name: params.get("name"),
+date: params.get("date"),
+time: params.get("time"),
+token: params.get("token")
+};
+
+/* show */
+document.getElementById("name").innerText = "Name: "+data.name;
+document.getElementById("date").innerText = "Date: "+data.date;
+document.getElementById("time").innerText = "Time: "+data.time;
+document.getElementById("token").innerText = data.token;
+
+/* 🔥 save to localStorage */
+localStorage.setItem("myToken", JSON.stringify(data));
+
+function goHome(){
+window.location.href="index.html";
+}
 
 </script>
 
