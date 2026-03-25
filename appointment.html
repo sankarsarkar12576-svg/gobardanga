@@ -4,40 +4,60 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <style>
-body {font-family: Arial; padding:15px; background:#f4f8fb;}
-.card {background:white; padding:15px; border-radius:10px;}
+body {
+  font-family: Arial;
+  background:#eef3ff;
+  margin:0;
+}
+
+.card {
+  background:white;
+  margin:10px;
+  padding:15px;
+  border-radius:12px;
+  box-shadow:0 3px 10px rgba(0,0,0,0.1);
+}
+
+h2{text-align:center;}
 
 input, select {
   width:100%;
-  padding:10px;
+  padding:12px;
   margin:8px 0;
+  border-radius:8px;
+  border:1px solid #ccc;
+  font-size:16px;
 }
 
-.slot {
-  display:inline-block;
-  padding:6px 10px;
-  margin:5px;
+/* time buttons */
+.time-box{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+}
+
+.time{
+  flex:1 0 45%;
+  text-align:center;
+  padding:10px;
   border:1px solid #0d6efd;
+  border-radius:8px;
   cursor:pointer;
-  border-radius:6px;
 }
 
-.selected {background:#0d6efd;color:white;}
+.selected{
+  background:#0d6efd;
+  color:white;
+}
 
 button {
   width:100%;
-  padding:12px;
-  margin-top:10px;
+  padding:14px;
   background:#0d6efd;
   color:white;
   border:none;
   border-radius:10px;
-}
-
-.booked {
-  background:red;
-  color:white;
-  pointer-events:none;
+  font-size:16px;
 }
 </style>
 </head>
@@ -53,124 +73,101 @@ button {
 
 <select id="clinic">
 <option value="">Select Clinic</option>
-<option value="g1">Gobardanga</option>
-<option value="g2">Prosanna Gang</option>
-<option value="t1">Tuesday Clinic</option>
+<option value="g1">Gobardanga Polyclinic</option>
+<option value="g2">Prosanna Gang Clinic</option>
+<option value="t1">German Clinic</option>
 </select>
 
-<button onclick="generate()">Show Time</button>
+<select id="date"></select>
 
-<div id="days"></div>
+<div id="timeBox" class="time-box"></div>
 
-<button onclick="confirmBooking()">✅ Book Appointment</button>
+<button onclick="confirmBooking()">Book Appointment</button>
 
 </div>
 
 <script>
 
-let selectedDate="", selectedTime="";
-let bookedSlots=[];
+let selectedTime="";
 
-/* load booked */
-async function loadBooked(){
-let res = await fetch("YOUR_SCRIPT_URL");
-bookedSlots = await res.json();
-}
-loadBooked();
-
-/* simple slots */
-function generate(){
-
-let clinic=document.getElementById("clinic").value;
-
-let today=new Date();
-let html="";
+/* load 7 days */
+function loadDates(){
+let d=new Date();
+let html="<option value=''>Select Date</option>";
 
 for(let i=0;i<7;i++){
+let nd=new Date();
+nd.setDate(d.getDate()+i);
 
-let d=new Date();
-d.setDate(today.getDate()+i);
+let val=nd.toISOString().split("T")[0];
+let text=nd.toDateString();
 
-let dateStr=d.toISOString().split("T")[0];
-
-html += "<div><b>"+d.toDateString()+"</b><br>";
-
-for(let h=8;h<10;h++){
-for(let m=0;m<60;m+=10){
-
-let time=h+":"+ (m<10?"0"+m:m);
-
-let isBooked = bookedSlots.find(b =>
-b.clinic==clinic && b.date==dateStr && b.time==time
-);
-
-if(isBooked){
-html+=`<span class='slot booked'>${time}</span>`;
-}else{
-html+=`<span class='slot' onclick="selectSlot(this,'${dateStr}','${time}')">${time}</span>`;
+html+=`<option value="${val}">${text}</option>`;
 }
 
+document.getElementById("date").innerHTML=html;
 }
-}
+loadDates();
 
-html+="</div>";
-}
+/* clinic time */
+const clinicTime={
+g1:["8:00 AM","9:00 AM","5:00 PM","6:00 PM"],
+g2:["10:00 AM","11:00 AM","2:00 PM","3:00 PM"],
+t1:["10:00 AM","11:00 AM"]
+};
 
-document.getElementById("days").innerHTML=html;
-}
+/* show time */
+document.getElementById("clinic").addEventListener("change",function(){
+
+let clinic=this.value;
+let times=clinicTime[clinic]||[];
+
+let html="";
+
+times.forEach(t=>{
+html+=`<div class="time" onclick="selectTime(this,'${t}')">${t}</div>`;
+});
+
+document.getElementById("timeBox").innerHTML=html;
+
+});
 
 /* select */
-function selectSlot(el,date,time){
+function selectTime(el,time){
 
-document.querySelectorAll(".slot").forEach(s=>s.classList.remove("selected"));
+document.querySelectorAll(".time").forEach(t=>t.classList.remove("selected"));
 
 el.classList.add("selected");
-
-selectedDate=date;
 selectedTime=time;
 }
 
-/* token generator */
+/* token */
 function generateToken(name,time){
-
-let first = name.charAt(0).toUpperCase();
-let serial = Math.floor(Math.random()*900+100);
-
-return first + serial + time.replace(":","");
+let first=name.charAt(0).toUpperCase();
+let serial=Math.floor(Math.random()*900+100);
+return first+serial+time.replace(":","").replace(" ","");
 }
 
 /* booking */
-async function confirmBooking(){
+function confirmBooking(){
 
 let name=document.getElementById("name").value;
 let phone=document.getElementById("phone").value;
 let clinic=document.getElementById("clinic").value;
+let date=document.getElementById("date").value;
 
-if(!name || !phone || !clinic || !selectedDate || !selectedTime){
-alert("Fill all ❌");
+if(!name||!phone||!clinic||!date||!selectedTime){
+alert("সব তথ্য পূরণ করুন ❌");
 return;
 }
 
-/* token */
-let token = generateToken(name,selectedTime);
-
-/* save */
-await fetch("YOUR_SCRIPT_URL",{
-method:"POST",
-mode:"no-cors",
-body:JSON.stringify({
-name,phone,clinic,
-date:selectedDate,
-time:selectedTime,
-token:token
-})
-});
+let token=generateToken(name,selectedTime);
 
 /* redirect */
 window.location.href="token.html?token="+token+
 "&name="+name+
 "&time="+selectedTime+
-"&date="+selectedDate;
+"&date="+date;
 
 }
 
