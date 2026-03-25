@@ -1,20 +1,71 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-body {font-family:Arial;text-align:center;padding:20px;background:#eef3ff;}
-.card {background:white;padding:20px;border-radius:12px;}
-.token {font-size:32px;color:#0d6efd;margin:15px 0;}
+body{
+margin:0;
+font-family:Arial;
+background:#f1f5f9;
+display:flex;
+justify-content:center;
+align-items:center;
+height:100vh;
+}
 
-.btn{
-  padding:12px 20px;
-  background:#0d6efd;
-  color:white;
-  border:none;
-  border-radius:10px;
-  margin-top:10px;
+/* Card */
+.card{
+background:white;
+width:90%;
+max-width:350px;
+border-radius:15px;
+box-shadow:0 5px 15px rgba(0,0,0,0.1);
+overflow:hidden;
+text-align:center;
+}
+
+/* Header */
+.header{
+background:#0d6efd;
+color:white;
+padding:15px;
+font-size:18px;
+font-weight:bold;
+}
+
+/* Body */
+.body{
+padding:20px;
+}
+
+.token{
+font-size:50px;
+font-weight:bold;
+color:#0d6efd;
+margin:10px 0;
+}
+
+.info{
+text-align:left;
+font-size:14px;
+margin-top:10px;
+}
+
+.info div{
+margin:5px 0;
+}
+
+/* Button */
+button{
+width:100%;
+padding:12px;
+margin-top:15px;
+border:none;
+border-radius:10px;
+background:#0d6efd;
+color:white;
+font-size:16px;
 }
 </style>
 </head>
@@ -23,40 +74,38 @@ body {font-family:Arial;text-align:center;padding:20px;background:#eef3ff;}
 
 <div class="card">
 
-<h2>✅ Appointment Confirmed</h2>
+<div class="header">🎟 Your Token</div>
 
-<p id="name"></p>
-<p id="date"></p>
-<p id="time"></p>
+<div class="body">
 
-<div class="token" id="token"></div>
+<div class="token" id="token">--</div>
 
-<button class="btn" onclick="goHome()">🏠 Back to Home</button>
+<div class="info">
+<div><b>Name:</b> <span id="name"></span></div>
+<div><b>Clinic:</b> <span id="clinic"></span></div>
+<div><b>Date:</b> <span id="date"></span></div>
+<div><b>Time:</b> <span id="time"></span></div>
+</div>
+
+<button onclick="goHome()">⬅ Back to Home</button>
+
+</div>
 
 </div>
 
 <script>
 
+// 👉 URL theke data niye ashchi
 let params = new URLSearchParams(window.location.search);
 
-let data = {
-name: params.get("name"),
-date: params.get("date"),
-time: params.get("time"),
-token: params.get("token")
-};
-
-/* show */
-document.getElementById("name").innerText = "Name: "+data.name;
-document.getElementById("date").innerText = "Date: "+data.date;
-document.getElementById("time").innerText = "Time: "+data.time;
-document.getElementById("token").innerText = data.token;
-
-/* 🔥 save to localStorage */
-localStorage.setItem("myToken", JSON.stringify(data));
+document.getElementById("token").innerText = params.get("token");
+document.getElementById("time").innerText = params.get("time");
+document.getElementById("name").innerText = params.get("name");
+document.getElementById("clinic").innerText = params.get("clinic");
+document.getElementById("date").innerText = params.get("date");
 
 function goHome(){
-window.location.href="index.html";
+window.location.href="index.html"; // home page
 }
 
 </script>
