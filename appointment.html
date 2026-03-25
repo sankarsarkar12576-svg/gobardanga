@@ -17,7 +17,7 @@ body {
   background: white;
   padding: 15px;
   border-radius: 12px;
-  max-width: 480px;
+  max-width: 500px;
   margin: auto;
 }
 
@@ -47,6 +47,9 @@ button {
   padding: 10px;
   background: #eef3ff;
   border-radius: 10px;
+}
+
+.slots {
   display: flex;
   flex-wrap: wrap;
 }
@@ -57,6 +60,7 @@ button {
   border: 1px solid #0d6efd;
   border-radius: 8px;
   font-size: 13px;
+  cursor: pointer;
 }
 
 .selected {
@@ -67,7 +71,6 @@ button {
 .booked {
   background: #dc3545;
   color: white;
-  border: 1px solid #dc3545;
   pointer-events: none;
 }
 </style>
@@ -84,15 +87,28 @@ button {
 
 <select id="clinic">
 <option value="">Select Clinic</option>
+
 <option value="g1">Gobardanga Polyclinic</option>
 <option value="g2">Prosanna Gang Clinic</option>
+<option value="tarunipur">Tarunipur (Monday)</option>
+<option value="bithari">Bithari</option>
+<option value="aajat">Aajat Pharmacy</option>
+<option value="katiya">Katiya Hat</option>
+<option value="basirhat">Basirhat</option>
+<option value="t1">German Clinic (Tuesday)</option>
+<option value="t2">New German (Tuesday)</option>
+<option value="th1">Dharampur (Thursday)</option>
+<option value="th2">Nagoruchra (Thursday)</option>
+<option value="sat1">Banga Clinic (Saturday)</option>
+<option value="sat2">Chakrabarty Hall (Saturday)</option>
+
 </select>
 
 <button onclick="generate()">Show Time</button>
 
 <div id="days"></div>
 
-<button onclick="confirmBooking()">✅ Book</button>
+<button onclick="confirmBooking()">✅ Book Appointment</button>
 
 </div>
 
@@ -101,12 +117,31 @@ button {
 let selectedDate="", selectedTime="";
 let bookedSlots=[];
 
-// 👉 CHANGE THIS URL
+// 👉 PUT YOUR GOOGLE SCRIPT URL
 const SCRIPT_URL = "https://script.google.com/macros/s/XXXXX/exec";
 
+/* CLINIC TIME RULE */
 const clinicData = {
+
 g1:{days:[1,2,3,4,5,6], start:8, end:10},
-g2:{days:[1,2,3,4,5,6], start:10, end:12}
+g2:{days:[1,2,3,4,5,6], start:10, end:12},
+
+tarunipur:{days:[1], start:8, end:11},
+
+bithari:{days:[0,1,2,3,4,5,6], start:12, end:14},
+aajat:{days:[0,1,2,3,4,5,6], start:15, end:16},
+katiya:{days:[0,1,2,3,4,5,6], start:17, end:19},
+basirhat:{days:[0,1,2,3,4,5,6], start:19, end:21},
+
+t1:{days:[2], start:10, end:12},
+t2:{days:[2], start:12, end:14},
+
+th1:{days:[4], start:11, end:12},
+th2:{days:[4], start:12, end:14},
+
+sat1:{days:[6], start:10, end:13},
+sat2:{days:[6], start:10, end:13}
+
 };
 
 // load booked slots
@@ -127,7 +162,7 @@ let rules=clinicData[clinic];
 let today=new Date();
 let html="";
 
-for(let i=0;i<5;i++){
+for(let i=0;i<7;i++){
 
 let d=new Date();
 d.setDate(today.getDate()+i);
@@ -137,38 +172,43 @@ if(rules.days.indexOf(day)===-1) continue;
 
 let dateStr=d.toISOString().split("T")[0];
 
-html += "<div class='day'><b>"+d.toDateString()+"</b><br>";
+html += `<div class="day"><b>${d.toDateString()}</b><div class="slots">`;
 
-for(let h=rules.start;h<rules.end;h++){
-for(let m=0;m<60;m+=10){
+// 🔥 TOKEN SYSTEM (7 min)
+let startMin = rules.start * 60;
+let endMin = rules.end * 60;
+
+for(let t=startMin; t<endMin; t+=7){
+
+let h=Math.floor(t/60);
+let m=t%60;
 
 let hour=h>12?h-12:h;
 let ampm=h>=12?"PM":"AM";
 let min=m<10?"0"+m:m;
+
 let time=hour+":"+min+" "+ampm;
 
+// check booked
 let isBooked = bookedSlots.some(b =>
-  b.clinic === clinic &&
-  b.date === dateStr &&
-  b.time === time
+  b.clinic===clinic && b.date===dateStr && b.time===time
 );
 
 if(isBooked){
-html += `<span class='slot booked'>${time}</span>`;
+html += `<span class="slot booked">${time}</span>`;
 }else{
-html += `<span class='slot' onclick="selectSlot(this,'${dateStr}','${time}')">${time}</span>`;
+html += `<span class="slot" onclick="selectSlot(this,'${dateStr}','${time}')">${time}</span>`;
 }
 
 }
-}
 
-html += "</div>";
+html += `</div></div>`;
 }
 
 document.getElementById("days").innerHTML=html;
 }
 
-// select slot
+// select
 function selectSlot(el,date,time){
 document.querySelectorAll(".slot").forEach(s=>s.classList.remove("selected"));
 el.classList.add("selected");
@@ -194,7 +234,7 @@ body: JSON.stringify({name,phone,clinic,date:selectedDate,time:selectedTime})
 });
 
 alert("Booking Successful ✅");
-generate(); // refresh slots
+generate(); // refresh
 }
 
 </script>
