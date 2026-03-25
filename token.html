@@ -7,7 +7,7 @@
 body{
 margin:0;
 font-family:Arial;
-background:#f1f5f9;
+background:#eef2f7;
 display:flex;
 justify-content:center;
 align-items:center;
@@ -22,28 +22,32 @@ max-width:350px;
 border-radius:15px;
 box-shadow:0 5px 15px rgba(0,0,0,0.1);
 overflow:hidden;
-text-align:center;
 }
 
 /* Header */
 .header{
-background:#0d6efd;
-color:white;
 padding:15px;
+color:white;
+text-align:center;
 font-size:18px;
 font-weight:bold;
 }
 
+/* Green / Red */
+.green{background:#28a745;}
+.red{background:#dc3545;}
+
 /* Body */
 .body{
 padding:20px;
+text-align:center;
 }
 
 .token{
-font-size:50px;
+font-size:45px;
 font-weight:bold;
-color:#0d6efd;
 margin:10px 0;
+color:#0d6efd;
 }
 
 .info{
@@ -53,10 +57,9 @@ margin-top:10px;
 }
 
 .info div{
-margin:5px 0;
+margin:6px 0;
 }
 
-/* Button */
 button{
 width:100%;
 padding:12px;
@@ -74,20 +77,21 @@ font-size:16px;
 
 <div class="card">
 
-<div class="header">🎟 Your Token</div>
+<div id="statusBar" class="header">Token</div>
 
 <div class="body">
 
-<div class="token" id="token">--</div>
+<div class="token" id="token"></div>
 
 <div class="info">
 <div><b>Name:</b> <span id="name"></span></div>
+<div><b>Phone:</b> <span id="phone"></span></div>
 <div><b>Clinic:</b> <span id="clinic"></span></div>
 <div><b>Date:</b> <span id="date"></span></div>
 <div><b>Time:</b> <span id="time"></span></div>
 </div>
 
-<button onclick="goHome()">⬅ Back to Home</button>
+<button onclick="goBack()">⬅ Back</button>
 
 </div>
 
@@ -95,17 +99,40 @@ font-size:16px;
 
 <script>
 
-// 👉 URL theke data niye ashchi
-let params = new URLSearchParams(window.location.search);
+// 👉 URL data
+let p=new URLSearchParams(window.location.search);
 
-document.getElementById("token").innerText = params.get("token");
-document.getElementById("time").innerText = params.get("time");
-document.getElementById("name").innerText = params.get("name");
-document.getElementById("clinic").innerText = params.get("clinic");
-document.getElementById("date").innerText = params.get("date");
+let name=p.get("name");
+let phone=p.get("phone");
+let clinic=p.get("clinic");
+let date=p.get("date");
+let time=p.get("time");
+let token=p.get("token");
 
-function goHome(){
-window.location.href="index.html"; // home page
+// set data
+document.getElementById("name").innerText=name;
+document.getElementById("phone").innerText=phone;
+document.getElementById("clinic").innerText=clinic;
+document.getElementById("date").innerText=date;
+document.getElementById("time").innerText=time;
+document.getElementById("token").innerText=token;
+
+// 🔥 STATUS COLOR
+let today=new Date();
+let bookingDate=new Date(date);
+
+let bar=document.getElementById("statusBar");
+
+if(bookingDate < today){
+bar.classList.add("red");
+bar.innerText="❌ Appointment Over";
+}else{
+bar.classList.add("green");
+bar.innerText="✅ Active Token";
+}
+
+function goBack(){
+window.location.href="index.html";
 }
 
 </script>
