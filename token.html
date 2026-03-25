@@ -14,7 +14,6 @@ align-items:center;
 height:100vh;
 }
 
-/* Card */
 .card{
 background:white;
 width:90%;
@@ -24,7 +23,6 @@ box-shadow:0 5px 15px rgba(0,0,0,0.1);
 overflow:hidden;
 }
 
-/* Header */
 .header{
 padding:15px;
 color:white;
@@ -33,32 +31,20 @@ font-size:18px;
 font-weight:bold;
 }
 
-/* Green / Red */
 .green{background:#28a745;}
 .red{background:#dc3545;}
 
-/* Body */
-.body{
-padding:20px;
-text-align:center;
-}
+.body{padding:20px;text-align:center;}
 
 .token{
 font-size:45px;
 font-weight:bold;
-margin:10px 0;
 color:#0d6efd;
+margin:10px 0;
 }
 
-.info{
-text-align:left;
-font-size:14px;
-margin-top:10px;
-}
-
-.info div{
-margin:6px 0;
-}
+.info{text-align:left;font-size:14px;margin-top:10px;}
+.info div{margin:6px 0;}
 
 button{
 width:100%;
@@ -91,16 +77,7 @@ font-size:16px;
 <div><b>Time:</b> <span id="time"></span></div>
 </div>
 
-<button onclick="goBack()">⬅ Back</button>
-  let token = p.get("token");
-
-if(!token){
-document.body.innerHTML = `
-<div style="text-align:center;padding:50px;font-family:Arial;">
-<h2>❌ No Active Token</h2>
-<p>Please book appointment first</p>
-</div>
-`;
+<button onclick="goHome()">⬅ Back</button>
 
 </div>
 
@@ -108,43 +85,51 @@ document.body.innerHTML = `
 
 <script>
 
-// 👉 URL data
 let p=new URLSearchParams(window.location.search);
 
+let token=p.get("token");
+
+// ❌ No data case
+if(!token){
+document.body.innerHTML=`
+<div style="display:flex;justify-content:center;align-items:center;height:100vh;">
+<div style="background:white;padding:25px;border-radius:12px;text-align:center;">
+<h2 style="color:red;">No Active Token</h2>
+<button onclick="goHome()">Go Booking</button>
+</div>
+</div>`;
+throw new Error("No data");
+}
+
+// ✅ Set data
 let name=p.get("name");
 let phone=p.get("phone");
 let clinic=p.get("clinic");
 let date=p.get("date");
 let time=p.get("time");
-let token=p.get("token");
 
-// set data
+document.getElementById("token").innerText=token;
 document.getElementById("name").innerText=name;
 document.getElementById("phone").innerText=phone;
 document.getElementById("clinic").innerText=clinic;
 document.getElementById("date").innerText=date;
 document.getElementById("time").innerText=time;
-document.getElementById("token").innerText=token;
 
-// 🔥 STATUS COLOR
+// 🔥 Status color
 let today=new Date();
-let bookingDate=new Date(date);
+let d=new Date(date);
 
 let bar=document.getElementById("statusBar");
-  let p = new URLSearchParams(window.location.search);
-  
-throw new Error("No data");
-}
 
-if(bookingDate < today){
+if(d < today){
 bar.classList.add("red");
-bar.innerText="❌ Appointment Over";
+bar.innerText="❌ Expired Token";
 }else{
 bar.classList.add("green");
 bar.innerText="✅ Active Token";
 }
 
-function goBack(){
+function goHome(){
 window.location.href="index.html";
 }
 
