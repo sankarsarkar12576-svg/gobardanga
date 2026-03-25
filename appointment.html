@@ -4,7 +4,6 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-
 *{box-sizing:border-box;}
 
 body{
@@ -13,7 +12,7 @@ body{
   background:#f1f5f9;
 }
 
-/* 🔷 Header */
+/* Header */
 .header{
   display:flex;
   align-items:center;
@@ -30,10 +29,8 @@ body{
   cursor:pointer;
 }
 
-/* 🔷 Card */
-.container{
-  padding:12px;
-}
+/* Container */
+.container{padding:12px;}
 
 .card{
   background:white;
@@ -42,28 +39,21 @@ body{
   box-shadow:0 4px 10px rgba(0,0,0,0.08);
 }
 
-/* 🔷 Inputs */
 input,select{
   width:100%;
   padding:12px;
   margin:10px 0;
   border-radius:8px;
   border:1px solid #ddd;
-  font-size:15px;
 }
 
-/* 🔷 Date box */
+/* Date */
 .day{
   padding:12px;
   margin:8px 0;
   background:#eef3ff;
   border-radius:10px;
   cursor:pointer;
-  transition:0.2s;
-}
-
-.day:hover{
-  background:#dbe7ff;
 }
 
 .selected{
@@ -71,7 +61,7 @@ input,select{
   color:white;
 }
 
-/* 🔷 Button */
+/* Button */
 button{
   width:100%;
   padding:13px;
@@ -82,94 +72,60 @@ button{
   color:white;
   font-size:16px;
   font-weight:bold;
-  box-shadow:0 3px 6px rgba(0,0,0,0.1);
 }
-
-/* 🔷 Small text */
-.title{
-  font-size:16px;
-  font-weight:bold;
-  margin-top:10px;
-}
-
 </style>
 </head>
 
 <body>
 
-<!-- 🔷 HEADER -->
 <div class="header">
-  <span class="back-btn" onclick="goBack()">⬅</span>
-  Book Appointment
+<span class="back-btn" onclick="history.back()">⬅</span>
+Book Appointment
 </div>
 
 <div class="container">
-
 <div class="card">
 
-<div class="title">Patient Details</div>
-
-<input id="name" placeholder="Enter your name">
-<input id="phone" placeholder="Enter phone number">
-
-<div class="title">Select Clinic</div>
+<input id="name" placeholder="Your Name">
+<input id="phone" placeholder="Phone Number">
 
 <select id="clinic" onchange="generate()">
-<option value="">Choose clinic</option>
+<option value="">Select Clinic</option>
 
 <option value="g1">Gobardanga Polyclinic</option>
 <option value="g2">Prosanna Gang Clinic</option>
-<option value="tarunipur">Tarunipur</option>
 <option value="bithari">Bithari</option>
-<option value="aajat">Aajat Pharmacy</option>
-<option value="katiya">Katiya Hat</option>
 <option value="basirhat">Basirhat</option>
-<option value="t1">German Clinic</option>
-<option value="t2">New German</option>
-<option value="th1">Dharampur</option>
-<option value="th2">Nagoruchra</option>
-<option value="sat1">Banga Clinic</option>
-<option value="sat2">Chakrabarty Hall</option>
 
 </select>
 
-<div class="title">Select Date</div>
 <div id="days"></div>
 
 <button onclick="book()">Confirm Booking</button>
 
 </div>
-
 </div>
 
 <script>
 
 let selectedDate="";
 
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbxETVvjdd23rqhzGShZ0zbr6tRx5ryRrTQp4aLdftG1yUJbxCnldYHEWFxhn71hcPi9Lg/exec";
+const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwdCu6jifwbAZ8L_h68Qfe1HibSEW_nS5h9HBlSgecVGw0nwnQxS0WVq5EF5YXDChD0AQ/exec";
 
+/* clinic days */
 const clinicData={
-g1:{days:[1,2,3,4,5,6]},
-g2:{days:[1,2,3,4,5,6]},
-tarunipur:{days:[1]},
-bithari:{days:[0,1,2,3,4,5,6]},
-aajat:{days:[0,1,2,3,4,5,6]},
-katiya:{days:[0,1,2,3,4,5,6]},
-basirhat:{days:[0,1,2,3,4,5,6]},
-t1:{days:[2]},
-t2:{days:[2]},
-th1:{days:[4]},
-th2:{days:[4]},
-sat1:{days:[6]},
-sat2:{days:[6]}
+g1:[1,2,3,4,5,6],
+g2:[1,2,3,4,5,6],
+bithari:[0,1,2,3,4,5,6],
+basirhat:[0,1,2,3,4,5,6]
 };
 
+/* generate date */
 function generate(){
 
 let clinic=document.getElementById("clinic").value;
 if(!clinic) return;
 
-let rules=clinicData[clinic];
 let today=new Date();
 let html="";
 
@@ -178,11 +134,11 @@ for(let i=0;i<7;i++){
 let d=new Date();
 d.setDate(today.getDate()+i);
 
-if(!rules.days.includes(d.getDay())) continue;
+if(!clinicData[clinic].includes(d.getDay())) continue;
 
-let dateStr=d.toISOString().split("T")[0];
+let ds=d.toISOString().split("T")[0];
 
-html+=`<div class="day" onclick="selectDate(this,'${dateStr}')">
+html+=`<div class="day" onclick="selectDate(this,'${ds}')">
 ${d.toDateString()}
 </div>`;
 }
@@ -190,20 +146,22 @@ ${d.toDateString()}
 document.getElementById("days").innerHTML=html;
 }
 
+/* select */
 function selectDate(el,date){
 document.querySelectorAll(".day").forEach(d=>d.classList.remove("selected"));
 el.classList.add("selected");
 selectedDate=date;
 }
 
+/* booking */
 async function book(){
 
-let name=document.getElementById("name").value;
-let phone=document.getElementById("phone").value;
+let name=document.getElementById("name").value.trim();
+let phone=document.getElementById("phone").value.trim();
 let clinic=document.getElementById("clinic").value;
 
 if(!name||!phone||!clinic||!selectedDate){
-alert("Fill all details");
+alert("Fill all details ❌");
 return;
 }
 
@@ -211,21 +169,27 @@ try{
 
 let res=await fetch(SCRIPT_URL,{
 method:"POST",
-body:JSON.stringify({name,phone,clinic,date:selectedDate})
+body:JSON.stringify({
+  name:name,
+  phone:phone,
+  clinic:clinic,
+  date:selectedDate
+})
 });
 
-// 🔥 JSON receive করো
 let data=await res.json();
 
 // 🔥 redirect to token page
-window.location.href = `token.html?name=${name}&phone=${phone}&clinic=${clinic}&date=${selectedDate}&time=${data.time}&token=${data.token}`;
+window.location.href =
+`token.html?name=${encodeURIComponent(name)}&phone=${phone}&clinic=${clinic}&date=${selectedDate}&time=${data.time}&token=${data.token}`;
 
 }catch(e){
-alert("Booking error");
+alert("Booking failed ❌");
 console.log(e);
 }
 
 }
+
 </script>
 
 </body>
