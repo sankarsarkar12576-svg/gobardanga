@@ -10,7 +10,7 @@ function loadSlots(){
   if(!clinic || !date) return;
 
   // 👇 Google Sheet theke data fetch (example)
-  fetch("YOUR_GOOGLE_SHEET_WEB_APP_URL")
+  fetch("https://script.google.com/macros/s/AKfycbxETVvjdd23rqhzGShZ0zbr6tRx5ryRrTQp4aLdftG1yUJbxCnldYHEWFxhn71hcPi9Lg/exec")
     .then(res => res.json())
     .then(data => {
 
