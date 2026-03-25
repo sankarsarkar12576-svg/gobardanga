@@ -4,75 +4,11 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 
 <style>
-* { box-sizing: border-box; }
-
-body {
-  font-family: Arial;
-  margin: 0;
-  padding: 10px;
-  background: #f4f8fb;
-}
-
-.card {
-  background: white;
-  padding: 15px;
-  border-radius: 12px;
-  max-width: 500px;
-  margin: auto;
-}
-
-h2 { text-align: center; }
-
-input, select {
-  width: 100%;
-  padding: 12px;
-  margin: 8px 0;
-  font-size: 16px;
-  border-radius: 8px;
-  border: 1px solid #ccc;
-}
-
-button {
-  width: 100%;
-  padding: 12px;
-  margin-top: 10px;
-  background: #0d6efd;
-  color: white;
-  border: none;
-  border-radius: 10px;
-}
-
-.day {
-  margin-top: 12px;
-  padding: 10px;
-  background: #eef3ff;
-  border-radius: 10px;
-}
-
-.slots {
-  display: flex;
-  flex-wrap: wrap;
-}
-
-.slot {
-  padding: 8px 10px;
-  margin: 4px;
-  border: 1px solid #0d6efd;
-  border-radius: 8px;
-  font-size: 13px;
-  cursor: pointer;
-}
-
-.selected {
-  background: #0d6efd;
-  color: white;
-}
-
-.booked {
-  background: #dc3545;
-  color: white;
-  pointer-events: none;
-}
+body{font-family:Arial;padding:10px;background:#f4f8fb;}
+.card{background:white;padding:15px;border-radius:12px;max-width:500px;margin:auto;}
+input,select,button{width:100%;padding:12px;margin:8px 0;border-radius:8px;}
+.day{padding:10px;margin:8px 0;background:#eef3ff;border-radius:10px;cursor:pointer;}
+.selected{background:#0d6efd;color:white;}
 </style>
 </head>
 
@@ -80,12 +16,14 @@ button {
 
 <div class="card">
 
-<h2>📅 Book Appointment</h2>
+<button onclick="history.back()">⬅ Back</button>
+
+<h2>📅 Select Date</h2>
 
 <input id="name" placeholder="Your Name">
 <input id="phone" placeholder="Phone Number">
 
-<select id="clinic">
+<select id="clinic" onchange="generate()">
 <option value="">Select Clinic</option>
 
 <option value="g1">Gobardanga Polyclinic</option>
@@ -104,59 +42,45 @@ button {
 
 </select>
 
-<button onclick="generate()">Show Time</button>
-
 <div id="days"></div>
 
-<button onclick="confirmBooking()">✅ Book Appointment</button>
+<button onclick="book()">✅ Confirm Booking</button>
 
 </div>
 
 <script>
 
-let selectedDate="", selectedTime="";
-let bookedSlots=[];
+let selectedDate="";
 
-// 👉 PUT YOUR GOOGLE SCRIPT URL
-const SCRIPT_URL = "https://script.google.com/macros/s/XXXXX/exec";
+const SCRIPT_URL="https://script.google.com/macros/s/XXXXX/exec";
 
-/* CLINIC TIME RULE */
-const clinicData = {
+/* ✅ ALL CLINIC START TIME */
+const clinicData={
+g1:{days:[1,2,3,4,5,6],start:8},
+g2:{days:[1,2,3,4,5,6],start:10},
 
-g1:{days:[1,2,3,4,5,6], start:8, end:10},
-g2:{days:[1,2,3,4,5,6], start:10, end:12},
+tarunipur:{days:[1],start:8},
 
-tarunipur:{days:[1], start:8, end:11},
+bithari:{days:[0,1,2,3,4,5,6],start:12},
+aajat:{days:[0,1,2,3,4,5,6],start:15},
+katiya:{days:[0,1,2,3,4,5,6],start:17},
+basirhat:{days:[0,1,2,3,4,5,6],start:19},
 
-bithari:{days:[0,1,2,3,4,5,6], start:12, end:14},
-aajat:{days:[0,1,2,3,4,5,6], start:15, end:16},
-katiya:{days:[0,1,2,3,4,5,6], start:17, end:19},
-basirhat:{days:[0,1,2,3,4,5,6], start:19, end:21},
+t1:{days:[2],start:10},
+t2:{days:[2],start:12},
 
-t1:{days:[2], start:10, end:12},
-t2:{days:[2], start:12, end:14},
+th1:{days:[4],start:11},
+th2:{days:[4],start:12},
 
-th1:{days:[4], start:11, end:12},
-th2:{days:[4], start:12, end:14},
-
-sat1:{days:[6], start:10, end:13},
-sat2:{days:[6], start:10, end:13}
-
+sat1:{days:[6],start:10},
+sat2:{days:[6],start:10}
 };
 
-// load booked slots
-async function loadBooked(){
-let res = await fetch(SCRIPT_URL);
-bookedSlots = await res.json();
-}
-
-// generate slots
-async function generate(){
-
-await loadBooked();
+// generate next 7 days
+function generate(){
 
 let clinic=document.getElementById("clinic").value;
-if(!clinic){ alert("Select clinic"); return; }
+if(!clinic) return;
 
 let rules=clinicData[clinic];
 let today=new Date();
@@ -167,74 +91,43 @@ for(let i=0;i<7;i++){
 let d=new Date();
 d.setDate(today.getDate()+i);
 
-let day=d.getDay();
-if(rules.days.indexOf(day)===-1) continue;
+if(!rules.days.includes(d.getDay())) continue;
 
 let dateStr=d.toISOString().split("T")[0];
 
-html += `<div class="day"><b>${d.toDateString()}</b><div class="slots">`;
-
-// 🔥 TOKEN SYSTEM (7 min)
-let startMin = rules.start * 60;
-let endMin = rules.end * 60;
-
-for(let t=startMin; t<endMin; t+=7){
-
-let h=Math.floor(t/60);
-let m=t%60;
-
-let hour=h>12?h-12:h;
-let ampm=h>=12?"PM":"AM";
-let min=m<10?"0"+m:m;
-
-let time=hour+":"+min+" "+ampm;
-
-// check booked
-let isBooked = bookedSlots.some(b =>
-  b.clinic===clinic && b.date===dateStr && b.time===time
-);
-
-if(isBooked){
-html += `<span class="slot booked">${time}</span>`;
-}else{
-html += `<span class="slot" onclick="selectSlot(this,'${dateStr}','${time}')">${time}</span>`;
-}
-
-}
-
-html += `</div></div>`;
+html+=`<div class="day" onclick="selectDate(this,'${dateStr}')">${d.toDateString()}</div>`;
 }
 
 document.getElementById("days").innerHTML=html;
 }
 
-// select
-function selectSlot(el,date,time){
-document.querySelectorAll(".slot").forEach(s=>s.classList.remove("selected"));
+// select date
+function selectDate(el,date){
+document.querySelectorAll(".day").forEach(d=>d.classList.remove("selected"));
 el.classList.add("selected");
 selectedDate=date;
-selectedTime=time;
 }
 
 // booking
-async function confirmBooking(){
+async function book(){
 
 let name=document.getElementById("name").value;
 let phone=document.getElementById("phone").value;
 let clinic=document.getElementById("clinic").value;
 
-if(!name||!phone||!clinic||!selectedDate||!selectedTime){
+if(!name||!phone||!clinic||!selectedDate){
 alert("Fill all details");
 return;
 }
 
-await fetch(SCRIPT_URL,{
+let res=await fetch(SCRIPT_URL,{
 method:"POST",
-body: JSON.stringify({name,phone,clinic,date:selectedDate,time:selectedTime})
+body:JSON.stringify({name,phone,clinic,date:selectedDate})
 });
 
-alert("Booking Successful ✅");
-generate(); // refresh
+let text=await res.text();
+
+alert("✅ Booking Confirmed\n"+text);
 }
 
 </script>
