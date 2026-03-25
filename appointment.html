@@ -2,86 +2,21 @@
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
-
 <style>
-*{box-sizing:border-box;}
-
-body{
-  margin:0;
-  font-family:Arial;
-  background:#f1f5f9;
-}
-
-/* Header */
-.header{
-  display:flex;
-  align-items:center;
-  padding:12px;
-  background:#0d6efd;
-  color:white;
-  font-size:18px;
-  font-weight:bold;
-}
-
-.back-btn{
-  margin-right:10px;
-  font-size:20px;
-  cursor:pointer;
-}
-
-/* Container */
+body{margin:0;font-family:Arial;background:#f1f5f9;}
+.header{display:flex;align-items:center;padding:12px;background:#0d6efd;color:white;font-size:18px;}
 .container{padding:12px;}
-
-.card{
-  background:white;
-  border-radius:12px;
-  padding:15px;
-  box-shadow:0 4px 10px rgba(0,0,0,0.08);
-}
-
-input,select{
-  width:100%;
-  padding:12px;
-  margin:10px 0;
-  border-radius:8px;
-  border:1px solid #ddd;
-}
-
-/* Date */
-.day{
-  padding:12px;
-  margin:8px 0;
-  background:#eef3ff;
-  border-radius:10px;
-  cursor:pointer;
-}
-
-.selected{
-  background:#0d6efd;
-  color:white;
-}
-
-/* Button */
-button{
-  width:100%;
-  padding:13px;
-  margin-top:10px;
-  border:none;
-  border-radius:10px;
-  background:#0d6efd;
-  color:white;
-  font-size:16px;
-  font-weight:bold;
-}
+.card{background:white;padding:15px;border-radius:12px;box-shadow:0 4px 10px rgba(0,0,0,0.1);}
+input,select{width:100%;padding:12px;margin:10px 0;border-radius:8px;border:1px solid #ddd;}
+.day{padding:12px;margin:8px 0;background:#eef3ff;border-radius:10px;cursor:pointer;}
+.selected{background:#0d6efd;color:white;}
+button{width:100%;padding:13px;background:#0d6efd;color:white;border:none;border-radius:10px;}
 </style>
 </head>
 
 <body>
 
-<div class="header">
-<span class="back-btn" onclick="history.back()">⬅</span>
-Book Appointment
-</div>
+<div class="header">Book Appointment</div>
 
 <div class="container">
 <div class="card">
@@ -91,12 +26,10 @@ Book Appointment
 
 <select id="clinic" onchange="generate()">
 <option value="">Select Clinic</option>
-
-<option value="g1">Gobardanga Polyclinic</option>
-<option value="g2">Prosanna Gang Clinic</option>
+<option value="g1">Gobardanga</option>
+<option value="g2">Prosanna</option>
 <option value="bithari">Bithari</option>
 <option value="basirhat">Basirhat</option>
-
 </select>
 
 <div id="days"></div>
@@ -110,9 +43,8 @@ Book Appointment
 
 let selectedDate="";
 
-const SCRIPT_URL="https://script.google.com/macros/s/AKfycbwdCu6jifwbAZ8L_h68Qfe1HibSEW_nS5h9HBlSgecVGw0nwnQxS0WVq5EF5YXDChD0AQ/exec";
+const SCRIPT_URL="PASTE_YOUR_SCRIPT_URL";
 
-/* clinic days */
 const clinicData={
 g1:[1,2,3,4,5,6],
 g2:[1,2,3,4,5,6],
@@ -120,73 +52,52 @@ bithari:[0,1,2,3,4,5,6],
 basirhat:[0,1,2,3,4,5,6]
 };
 
-/* generate date */
 function generate(){
-
-let clinic=document.getElementById("clinic").value;
-if(!clinic) return;
+let c=document.getElementById("clinic").value;
+if(!c) return;
 
 let today=new Date();
 let html="";
 
 for(let i=0;i<7;i++){
-
 let d=new Date();
 d.setDate(today.getDate()+i);
 
-if(!clinicData[clinic].includes(d.getDay())) continue;
+if(!clinicData[c].includes(d.getDay())) continue;
 
 let ds=d.toISOString().split("T")[0];
 
-html+=`<div class="day" onclick="selectDate(this,'${ds}')">
-${d.toDateString()}
-</div>`;
+html+=`<div class="day" onclick="selectDate(this,'${ds}')">${d.toDateString()}</div>`;
 }
 
 document.getElementById("days").innerHTML=html;
 }
 
-/* select */
 function selectDate(el,date){
 document.querySelectorAll(".day").forEach(d=>d.classList.remove("selected"));
 el.classList.add("selected");
 selectedDate=date;
 }
 
-/* booking */
 async function book(){
 
-let name=document.getElementById("name").value.trim();
-let phone=document.getElementById("phone").value.trim();
+let name=document.getElementById("name").value;
+let phone=document.getElementById("phone").value;
 let clinic=document.getElementById("clinic").value;
 
 if(!name||!phone||!clinic||!selectedDate){
-alert("Fill all details ❌");
+alert("Fill all details");
 return;
 }
 
-try{
-
 let res=await fetch(SCRIPT_URL,{
 method:"POST",
-body:JSON.stringify({
-  name:name,
-  phone:phone,
-  clinic:clinic,
-  date:selectedDate
-})
+body:JSON.stringify({name,phone,clinic,date:selectedDate})
 });
 
 let data=await res.json();
 
-// 🔥 redirect to token page
-window.location.href =
-`token.html?name=${encodeURIComponent(name)}&phone=${phone}&clinic=${clinic}&date=${selectedDate}&time=${data.time}&token=${data.token}`;
-
-}catch(e){
-alert("Booking failed ❌");
-console.log(e);
-}
+window.location.href=`token.html?name=${name}&phone=${phone}&clinic=${clinic}&date=${selectedDate}&time=${data.time}&token=${data.token}`;
 
 }
 
