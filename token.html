@@ -122,6 +122,19 @@ let today=new Date();
 let bookingDate=new Date(date);
 
 let bar=document.getElementById("statusBar");
+  let p = new URLSearchParams(window.location.search);
+
+let token = p.get("token");
+
+if(!token){
+document.body.innerHTML = `
+<div style="text-align:center;padding:50px;font-family:Arial;">
+<h2>❌ No Active Token</h2>
+<p>Please book appointment first</p>
+</div>
+`;
+throw new Error("No data");
+}
 
 if(bookingDate < today){
 bar.classList.add("red");
