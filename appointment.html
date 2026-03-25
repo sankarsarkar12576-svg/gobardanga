@@ -13,13 +13,6 @@ input, select {
   margin:8px 0;
 }
 
-.day {
-  margin:10px 0;
-  padding:10px;
-  background:#eef3ff;
-  border-radius:8px;
-}
-
 .slot {
   display:inline-block;
   padding:6px 10px;
@@ -40,12 +33,11 @@ button {
   border:none;
   border-radius:10px;
 }
-  .booked {
-  background: #dc3545;
-  color: white;
-  border: 1px solid #dc3545;
-  cursor: not-allowed;
-  pointer-events: none;
+
+.booked {
+  background:red;
+  color:white;
+  pointer-events:none;
 }
 </style>
 </head>
@@ -61,24 +53,12 @@ button {
 
 <select id="clinic">
 <option value="">Select Clinic</option>
-
-<option value="g1">Gobardanga Polyclinic</option>
-<option value="g2">Prosanna Gang Clinic</option>
-<option value="tarunipur">Tarunipur (Monday)</option>
-<option value="bithari">Bithari</option>
-<option value="aajat">Aajat Pharmacy</option>
-<option value="katiya">Katiya Hat</option>
-<option value="basirhat">Basirhat</option>
-<option value="t1">German Clinic (Tuesday)</option>
-<option value="t2">New German (Tuesday)</option>
-<option value="th1">Dharampur (Thursday)</option>
-<option value="th2">Nagoruchra (Thursday)</option>
-<option value="sat1">Banga Clinic (Saturday)</option>
-<option value="sat2">Chakrabarty Hall (Saturday)</option>
-
+<option value="g1">Gobardanga</option>
+<option value="g2">Prosanna Gang</option>
+<option value="t1">Tuesday Clinic</option>
 </select>
 
-<button onclick="generate()">Show Available Time</button>
+<button onclick="generate()">Show Time</button>
 
 <div id="days"></div>
 
@@ -87,56 +67,21 @@ button {
 </div>
 
 <script>
+
 let selectedDate="", selectedTime="";
-    let bookedSlots = [];
-{
-  let res = await fetch("https://script.google.com/macros/s/AKfycbwEE-f5MvTx1nFeK064fPr5tprVejsS5nWz4s2nE3XFipFdlxDUlu4ihV_BmIkSAeYB/exec");
+let bookedSlots=[];
+
+/* load booked */
+async function loadBooked(){
+let res = await fetch("YOUR_SCRIPT_URL");
 bookedSlots = await res.json();
-
 }
-
 loadBooked();
 
-/* clinic rules */
-const clinicData = {
-
-g1:{days:[1,2,3,4,5,6], start:8, end:10},
-g2:{days:[1,2,3,4,5,6], start:10, end:12},
-
-tarunipur:{days:[1], start:8, end:11},
-
-bithari:{days:[0,1,2,3,4,5,6], start:12, end:14},
-aajat:{days:[0,1,2,3,4,5,6], start:15, end:16},
-katiya:{days:[0,1,2,3,4,5,6], start:17, end:19},
-basirhat:{days:[0,1,2,3,4,5,6], start:19, end:21},
-
-t1:{days:[2], start:10, end:12},
-t2:{days:[2], start:12, end:14},
-
-th1:{days:[4], start:11, end:12},
-th2:{days:[4], start:12, end:14},
-
-sat1:{days:[6], start:10, end:13},
-sat2:{days:[6], start:10, end:13}
-
-};
-
-/* generate */
+/* simple slots */
 function generate(){
 
 let clinic=document.getElementById("clinic").value;
-
-if(!clinic){
-alert("Select clinic first ❌");
-return;
-}
-
-let rules = clinicData[clinic];
-
-if(!rules){
-alert("Clinic error ❌");
-return;
-}
 
 let today=new Date();
 let html="";
@@ -146,51 +91,38 @@ for(let i=0;i<7;i++){
 let d=new Date();
 d.setDate(today.getDate()+i);
 
-let day=d.getDay();
-
-if(rules.days.indexOf(day) === -1) continue;
-
 let dateStr=d.toISOString().split("T")[0];
 
-html += "<div class='day'><b>"+d.toDateString()+"</b><br>";
+html += "<div><b>"+d.toDateString()+"</b><br>";
 
-for(let h=rules.start;h<rules.end;h++){
+for(let h=8;h<10;h++){
 for(let m=0;m<60;m+=10){
 
-let hour=h>12?h-12:h;
-let ampm=h>=12?"PM":"AM";
-let min=m<10?"0"+m:m;
+let time=h+":"+ (m<10?"0"+m:m);
 
-let time=hour+":"+min+" "+ampm;
-
-html += "<span class='slot' onclick=\"selectSlot(this,'"+dateStr+"','"+time+"')\">"+time+"</span>";
-}
-}
-
-html += "</div>";
-}
-
-document.getElementById("days").innerHTML = html;
-}
-  let isBooked = bookedSlots.find(b =>
-  b.clinic === clinic &&
-  b.date === dateStr &&
-  b.time === time
+let isBooked = bookedSlots.find(b =>
+b.clinic==clinic && b.date==dateStr && b.time==time
 );
 
 if(isBooked){
-  html += `<span class='slot booked'>${time}</span>`;
+html+=`<span class='slot booked'>${time}</span>`;
 }else{
-  html += `<span class='slot' onclick="selectSlot(this,'${dateStr}','${time}')">${time}</span>`;
+html+=`<span class='slot' onclick="selectSlot(this,'${dateStr}','${time}')">${time}</span>`;
+}
+
+}
+}
+
+html+="</div>";
+}
+
+document.getElementById("days").innerHTML=html;
 }
 
 /* select */
 function selectSlot(el,date,time){
 
-let all=document.getElementsByClassName("slot");
-for(let i=0;i<all.length;i++){
-all[i].classList.remove("selected");
-}
+document.querySelectorAll(".slot").forEach(s=>s.classList.remove("selected"));
 
 el.classList.add("selected");
 
@@ -198,7 +130,15 @@ selectedDate=date;
 selectedTime=time;
 }
 
-/* booking */
+/* token generator */
+function generateToken(name,time){
+
+let first = name.charAt(0).toUpperCase();
+let serial = Math.floor(Math.random()*900+100);
+
+return first + serial + time.replace(":","");
+}
+
 /* booking */
 async function confirmBooking(){
 
@@ -207,36 +147,30 @@ let phone=document.getElementById("phone").value;
 let clinic=document.getElementById("clinic").value;
 
 if(!name || !phone || !clinic || !selectedDate || !selectedTime){
-alert("Fill all details ❌");
+alert("Fill all ❌");
 return;
 }
 
-try{
+/* token */
+let token = generateToken(name,selectedTime);
 
-await fetch("https://script.google.com/macros/s/AKfycbwEE-f5MvTx1nFeK064fPr5tprVejsS5nWz4s2nE3XFipFdlxDUlu4ihV_BmIkSAeYB/exec", {
-  method:"POST",
-  mode: "no-cors",
-  body: JSON.stringify({
-    name: name,
-    phone: phone,
-    clinic: clinic,
-    date: selectedDate,
-    time: selectedTime
-  })
+/* save */
+await fetch("YOUR_SCRIPT_URL",{
+method:"POST",
+mode:"no-cors",
+body:JSON.stringify({
+name,phone,clinic,
+date:selectedDate,
+time:selectedTime,
+token:token
+})
 });
 
-alert(
-"Booked Successfully ✅\n\n"+
-"Name: "+name+"\n"+
-"Phone: "+phone+"\n"+
-"Date: "+selectedDate+"\n"+
-"Time: "+selectedTime
-);
-
-}catch(e){
-alert("Error saving booking ❌");
-console.log(e);
-}
+/* redirect */
+window.location.href="token.html?token="+token+
+"&name="+name+
+"&time="+selectedTime+
+"&date="+selectedDate;
 
 }
 
