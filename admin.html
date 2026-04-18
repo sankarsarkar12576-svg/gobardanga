@@ -1,1 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Restaurant Management Admin Panel</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function convertToBase64(file) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+                reader.readAsDataURL(file);
+            });
+        }
 
+        async function addItem() {
+            const name = $('#item-name').val();
+            const category = $('#item-category').val();
+            const imageFile = $('#item-image')[0].files[0];
+            const imageBase64 = await convertToBase64(imageFile);
+
+            // Call Google Apps Script API to add item
+            $.post('YOUR_GOOGLE_APPS_SCRIPT_URL', { name, category, image: imageBase64 }, function(response) {
+                alert('Item added successfully!');
+                loadItems();
+            });
+        }
+
+        function loadItems() {
+            // Call Google Apps Script API to get items
+            $.get('YOUR_GOOGLE_APPS_SCRIPT_URL', function(items) {
+                $('#item-list').empty();
+                items.forEach(item => {
+                    $('#item-list').append(`<li>${item.name} - ${item.category} <button onclick="deleteItem('${item.id}')">Delete</button></li>`);
+                });
+            });
+        }
+
+        function deleteItem(itemId) {
+            // Call Google Apps Script API to delete item
+            $.ajax({
+                url: 'YOUR_GOOGLE_APPS_SCRIPT_URL',
+                type: 'DELETE',
+                data: { id: itemId },
+                success: function() {
+                    alert('Item deleted successfully!');
+                    loadItems();
+                }
+            });
+        }
+
+        $(document).ready(function() {
+            loadItems();
+        });
+    </script>
+</head>
+<body>
+    <h1>Restaurant Management Admin Panel</h1>
+    <h2>Add New Item</h2>
+    <input type="text" id="item-name" placeholder="Item Name" required />
+    <input type="text" id="item-category" placeholder="Category" required />
+    <input type="file" id="item-image" required />
+    <button onclick="addItem()">Add Item</button>
+
+    <h2>Item List</h2>
+    <ul id="item-list"></ul>
+</body>
+</html>
